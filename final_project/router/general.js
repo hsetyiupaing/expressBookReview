@@ -66,6 +66,26 @@ public_users.get('/', function (req, res) {
   return res.status(200).json(availableBooks);
 });
 
+
+// Route: Get the list of available books (async version)
+public_users.get('/async', async function (req, res) {
+  try {
+    // Simulate async operation, e.g., fetching from a database
+    const availableBooks = await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(books.filter(book => book.available));
+      }, 100); // Simulate delay
+    });
+
+    if (availableBooks.length === 0) {
+      return res.status(404).json({ message: "No books available" });
+    }
+    return res.status(200).json(availableBooks);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Route: Get book details based on ISBN
 public_users.get('/isbn/:isbn', function (req, res) {
   // Extract ISBN from request parameters
@@ -80,6 +100,32 @@ public_users.get('/isbn/:isbn', function (req, res) {
     return res.status(404).json({ message: "Book not found" });
   }
 });
+
+// ...existing code...
+
+// Route: Get book details based on ISBN using Promises
+public_users.get('/isbn-promise/:isbn', function (req, res) {
+  const isbn = req.params.isbn;
+
+  // Simulate async operation using Promise
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(books.getBookByISBN(isbn));
+    }, 100); // Simulate delay
+  })
+    .then(book => {
+      if (book) {
+        res.status(200).json(book);
+      } else {
+        res.status(404).json({ message: "Book not found" });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: "Server error" });
+    });
+});
+
+// ...existing code...
 
 // Route: Get book details based on author
 public_users.get('/author/:author', function (req, res) {
